@@ -1,13 +1,13 @@
-# Paid plans are intentional: do not rely on free-tier uptime for education/payments.
+# FREE TEST ONLY: sleeping web service, temporary PostgreSQL; not for real payments.
 services:
   - type: web
     name: ai-study-bot
     runtime: docker
-    plan: starter
+    plan: free
     region: frankfurt
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./ai-study-bot/Dockerfile
+    dockerContext: ./ai-study-bot
     healthCheckPath: /health/ready
-    preDeployCommand: alembic upgrade head && python -m scripts.seed
     autoDeployTrigger: checksPass
     envVars:
       - key: APP_ENV
@@ -26,7 +26,6 @@ services:
         generateValue: true
       - key: WEBHOOK_SECRET
         generateValue: true
-      # RENDER_EXTERNAL_URL is supplied by Render; PUBLIC_BASE_URL overrides it.
       - key: OPENAI_API_KEY
         sync: false
       - key: SUPPORT_CONTACT
@@ -50,7 +49,7 @@ databases:
   - name: ai-study-db
     databaseName: ai_study
     user: study
-    plan: basic-1gb
+    plan: free
     region: frankfurt
     postgresMajorVersion: "16"
     ipAllowList: []
