@@ -1,0 +1,56 @@
+# Paid plans are intentional: do not rely on free-tier uptime for education/payments.
+services:
+  - type: web
+    name: ai-study-bot
+    runtime: docker
+    plan: starter
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health/ready
+    preDeployCommand: alembic upgrade head && python -m scripts.seed
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: BOT_MODE
+        value: webhook
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ai-study-db
+          property: connectionString
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_IDS
+        sync: false
+      - key: ADMIN_API_TOKEN
+        generateValue: true
+      - key: WEBHOOK_SECRET
+        generateValue: true
+      # RENDER_EXTERNAL_URL is supplied by Render; PUBLIC_BASE_URL overrides it.
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: SUPPORT_CONTACT
+        sync: false
+      - key: PRIVACY_CONTACT
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      - key: TRANSCRIPTION_ENABLED
+        value: "false"
+      - key: TTS_ENABLED
+        value: "false"
+      - key: AI_FREE_DAILY_REQUESTS
+        value: "3"
+      - key: AI_PREMIUM_DAILY_REQUESTS
+        value: "30"
+      - key: LOG_LEVEL
+        value: INFO
+
+databases:
+  - name: ai-study-db
+    databaseName: ai_study
+    user: study
+    plan: basic-1gb
+    region: frankfurt
+    postgresMajorVersion: "16"
+    ipAllowList: []
